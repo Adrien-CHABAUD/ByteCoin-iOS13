@@ -8,21 +8,25 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
-
+class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, CoinManagerDelegate {
+    
     @IBOutlet weak var bitcoinLabel: UILabel!
     @IBOutlet weak var currencyLabel: UILabel!
     @IBOutlet weak var currencyPicker: UIPickerView!
     
-    let coinManager = CoinManager()
+    var coinManager = CoinManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        coinManager.delegate = self
         
         // Set the picker's datasource & delegate func
         currencyPicker.dataSource = self
         currencyPicker.delegate = self
     }
+    
+    //MARK: - Picker Functions
     
     // Only one picker
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -45,7 +49,19 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         // Pass the currency to the getCoinPrice function
         coinManager.getCoinPrice(for: currencySelected)
     }
-
+    
+    //MARK: - Delegate functions
+    
+    func didUpdateCoin(currency: String, price: String) {
+        DispatchQueue.main.async {
+            self.bitcoinLabel.text = currency
+            self.currencyLabel.text = price
+        }
+    }
+    
+    func didFailWithEror(error: Error) {
+        print(error)
+    }
 
 }
 
